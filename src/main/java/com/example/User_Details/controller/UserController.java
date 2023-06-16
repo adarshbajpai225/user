@@ -1,16 +1,18 @@
 package com.example.User_Details.controller;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.query.NativeQuery;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,51 +21,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.User_Details.entity.User;
-import com.example.User_Details.service.UserService;
+import com.example.User_Details.entity.UserProfile;
+import com.example.User_Details.util.DBUtility;
 
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
+	
+	    @PersistenceContext
+	    private EntityManager entityManager;
 
 	
-	@Autowired
-	private UserService userService;
 	
 	@PostMapping("/post")
 	public User Save(@RequestBody User user)
 	{
-         userService.save(user);
-	    return user;
+		EntityManager entityManager = DBUtility.getEntityManager();
+	     entityManager.getTransaction().begin();
+		entityManager.persist(user);
+		entityManager.getTransaction().commit();
+		
+		return user;
+		
 	}
 
 	
-	
-	
-//	@GetMapping("/get")
-//	public void getUser(){
-//		SessionFactory factory = new Configuration().configure().buildSessionFactory();
-//	    Session session = factory.openSession();
-//
-//	    String query = "SELECT * FROM user";
-//	    NativeQuery<Object[]> nativeQuery = session.createNativeQuery(query);
-//
-//	    List<Object[]> resultList = nativeQuery.list();
-//
-//	    for (Object[] user : resultList) {
-//	        System.out.println(Arrays.toString(user));
-//	        System.out.println(user[0] + " : " + user[1]);
-//	    }
-//
-//	    session.close();
-//	    factory.close();
-//		
-//	}
+
 	
 	@GetMapping("/get")
 	public List<User> getUser(){
 		
-		return userService.getUser();
+		EntityManager entityManager = DBUtility.getEntityManager();
+		TypedQuery<User> query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
+				User.class);
+		return query.getResultList();
 		
 		
 	}
@@ -75,10 +67,65 @@ public class UserController {
 	public User getUserById(@PathVariable Long id)
 	{
 		
-	    return userService.getUserById(id);
+		EntityManager entityManager = DBUtility.getEntityManager();
+
+		return entityManager.find(User.class, id);
 		
 	}
 	
+	   
+
+	   @GetMapping("/join")
+	   public List<UserWithProfileDto> getUsersWithProfile() {
+		   EntityManager entityManager=DBUtility.getEntityManager();
+		   
+	       String sqlQuery = "SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.status, up.up_id, up.dob " +
+	                         "FROM user u " +
+	                         "LEFT JOIN userprofile up ON u.id = up.userid";
+	       
+	       Query query = entityManager.createNativeQuery(sqlQuery);
+	       List<Object[]> result = query.getResultList();
+	       
+	       List<UserWithProfileDto> userWithProfileList = new ArrayList<>();
+	       for (Object[] row : result) {
+	           Integer userId = (Integer) row[0];
+	           String firstname = (String) row[1];
+	           String lastname = (String) row[2];
+	           String email = (String) row[3];
+	           String password = (String) row[4];
+	           Byte status = (Byte) row[5];
+	           Integer profileId = (Integer) row[6];
+	           Date dob =(Date) row[7];
+	          
+	           
+	           UserWithProfileDto userWithProfile = new UserWithProfileDto(userId, firstname, lastname, email, password, status, profileId, dob);
+	           userWithProfileList.add(userWithProfile);
+	       }
+	       
+	       return userWithProfileList;
+	   }
+
+		
+		
+//		@GetMapping("/get")
+//		public void getUser(){
+//			SessionFactory factory = new Configuration().configure().buildSessionFactory();
+//		    Session session = factory.openSession();
+	//
+//		    String query = "SELECT * FROM user";
+//		    NativeQuery<Object[]> nativeQuery = session.createNativeQuery(query);
+	//
+//		    List<Object[]> resultList = nativeQuery.list();
+	//
+//		    for (Object[] user : resultList) {
+//		        System.out.println(Arrays.toString(user));
+//		        System.out.println(user[0] + " : " + user[1]);
+//		    }
+	//
+//		    session.close();
+//		    factory.close();
+//			
+//		}
 	
 	
 }
