@@ -2,16 +2,13 @@ package com.example.User_Details.controller;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.User_Details.entity.User;
-import com.example.User_Details.entity.UserProfile;
 import com.example.User_Details.util.DBUtility;
 
 
@@ -37,10 +33,26 @@ public class UserController {
 	@PostMapping("/post")
 	public User Save(@RequestBody User user)
 	{
-		EntityManager entityManager = DBUtility.getEntityManager();
-	     entityManager.getTransaction().begin();
-		entityManager.persist(user);
-		entityManager.getTransaction().commit();
+		EntityManager em = DBUtility.getEntityManager();
+	    EntityTransaction et=   em.getTransaction();
+	    
+	    try {
+	         et.begin();
+	         em.persist(user);
+		      et.commit();
+	    }
+	    catch(Exception e)
+	    {  
+	    	  
+	          et.rollback(); 
+	          String errorMessage = e.getMessage();
+	         
+	    }
+	    finally
+	    {
+	    	em.close();
+	    }
+		
 		
 		return user;
 		
@@ -104,7 +116,10 @@ public class UserController {
 	       
 	       return userWithProfileList;
 	   }
-
+        
+	   
+	// Example method to fetch level 2 data (User Address) using userId
+	 
 		
 		
 //		@GetMapping("/get")

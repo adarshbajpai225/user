@@ -2,10 +2,10 @@ package com.example.User_Details.controller;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,16 +20,28 @@ import com.example.User_Details.util.DBUtility;
 @RequestMapping("/address")
 public class AddressController {
 	
-	@Autowired
-	private PersistenceContext persistenceContext;
+	@PersistenceContext
+	private EntityManager entityManager;
 	
 	@PostMapping("/post")
 	public Address add(@RequestBody Address address)
 	{
-		 EntityManager et=DBUtility.getEntityManager();
-	     et.getTransaction().begin();
-	     et.persist(address);
-	     et.getTransaction().commit();
+		 EntityManager em=DBUtility.getEntityManager();
+		 
+	    EntityTransaction et =em.getTransaction();
+	      
+	    try {
+	     et.begin();
+	     em.persist(address);
+	     et.commit();
+	    }catch(Exception e)
+	    {
+	    	et.rollback();
+	    }finally
+	    {
+	    	em.close();
+	    }
+	    
 	     return address;
 	}
 	

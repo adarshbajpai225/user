@@ -3,10 +3,9 @@ package com.example.User_Details.controller;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +29,22 @@ public class UserProfileController {
 	public UserProfile post(@RequestBody UserProfile userProfile)
 	{
 		EntityManager entityManager=DBUtility.getEntityManager();
-		entityManager.getTransaction().begin();
-		entityManager.persist(userProfile);
-		entityManager.getTransaction().commit();
+		  EntityTransaction et=  entityManager.getTransaction();
+		try {  
+			et.begin();
+		     entityManager.persist(userProfile);
+		      et.commit();
+		}
+		catch(Exception e)
+		{
+			et.rollback();
+			String m=e.getMessage();
+		}
+		finally
+		{
+			entityManager.close();
+		}
+		
 		return userProfile;
 	}
 	
