@@ -24,6 +24,7 @@ public class AddressController {
 		EntityManager em = null;
 
 		EntityTransaction et = null;
+		Address result=null;
 
 		try {
 			em = DBUtility.getEntityManager();
@@ -31,39 +32,50 @@ public class AddressController {
 			et.begin();
 			em.persist(address);
 			et.commit();
+			result=address;
+			
 		} catch (Exception e) {
 			et.rollback();
 			throw new RuntimeException(e);
 		} finally {
-			em.close();
+			if(em !=null && em.isOpen())
+			{
+				em.close();
+			}
+			
 		}
 
-		return address;
+		return result;
 	}
 
 	@GetMapping("/get/{id}")
 	public Address get(@PathVariable Long id) {
+		EntityManager et = null;
+		Address result=null;
+		
 		try {
-			EntityManager et = DBUtility.getEntityManager();
+		    et = DBUtility.getEntityManager();
 
-			return et.find(Address.class, id);
+			result =et.find(Address.class, id);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
+        return result;
 	}
 
 	@GetMapping("/get")
 	public List<Address> getAll() {
+		EntityManager entityManager = null;
+		List<Address> list=null;
 		try {
-			EntityManager entityManager = DBUtility.getEntityManager();
-			TypedQuery<Address> query = entityManager
-					.createQuery("SELECT t from " + Address.class.getSimpleName() + " t", Address.class);
+		  entityManager = DBUtility.getEntityManager();
+		  TypedQuery<Address> query = entityManager.createQuery("SELECT t from " + Address.class.getSimpleName() + " t", Address.class);
 
-			return query.getResultList();
+			list= query.getResultList();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		return list;
 	}
 
 }

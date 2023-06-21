@@ -17,6 +17,7 @@ public class UserwithProfileController {
 	@GetMapping("/alluser/{state}/{city}")
 	public List<User> getUserWithProfile(@PathVariable("state") String state, @PathVariable("city") String city) {
 		EntityManager entityManager = null;
+		List<User> result=null;
 		 
 		try {
 			entityManager = DBUtility.getEntityManager();
@@ -39,13 +40,15 @@ public class UserwithProfileController {
 				query.setParameter("city", city);
 			}
 
-			List<User> userList = query.getResultList();
+			  result = query.getResultList();
 
-			return userList;
+			  
 
 		} catch (Exception e) {
 
 			throw new RuntimeException(e);
 		}
+		
+		return result;
 	}
 }

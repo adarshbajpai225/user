@@ -23,47 +23,56 @@ public class MobileController {
 	public Mobile save(@RequestBody Mobile mobile) {
 		EntityManager em = null;
 		EntityTransaction et = null;
-
+         Mobile mb=null;
 		try {
 			em = DBUtility.getEntityManager();
 			et = em.getTransaction();
 			et.begin();
 			em.persist(mobile);
-
 			et.commit();
+			mb=mobile;
 		} catch (Exception e) {
 			et.rollback();
 			throw new RuntimeException(e);
 		} finally {
-			em.close();
+			if(em !=null && em.isOpen())
+			{
+				em.close();
+			}
+			
 		}
-		return mobile;
+		return mb;
 
 	}
 
 	@GetMapping("/get/{id}")
 	public Mobile getById(@PathVariable Long id) {
+		EntityManager et =null;
+		Mobile result=null;
 		try {
-			EntityManager et = DBUtility.getEntityManager();
+		   et = DBUtility.getEntityManager();
 
-			return et.find(Mobile.class, id);
+			result= et.find(Mobile.class, id);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
+      return result;
 	}
 
 	@GetMapping("/get")
 	public List<Mobile> getAll() {
+		EntityManager et = DBUtility.getEntityManager();
+		List<Mobile> result=null;
 		try {
-			EntityManager et = DBUtility.getEntityManager();
+		   et = DBUtility.getEntityManager();
 
 			TypedQuery<Mobile> q = et.createQuery("SELECT t from " + Mobile.class.getSimpleName() + "t", Mobile.class);
 
-			return q.getResultList();
+			result= q.getResultList();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		return result;
 
 	}
 
