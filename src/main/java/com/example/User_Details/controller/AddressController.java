@@ -19,49 +19,40 @@ import com.example.User_Details.util.DBUtility;
 @RestController
 @RequestMapping("/address")
 public class AddressController {
-	
-	@PersistenceContext
-	private EntityManager entityManager;
-	
+
 	@PostMapping("/post")
-	public Address add(@RequestBody Address address)
-	{
-		 EntityManager em=DBUtility.getEntityManager();
-		 
-	    EntityTransaction et =em.getTransaction();
-	      
-	    try {
-	     et.begin();
-	     em.persist(address);
-	     et.commit();
-	    }catch(Exception e)
-	    {
-	    	et.rollback();
-	    }finally
-	    {
-	    	em.close();
-	    }
-	    
-	     return address;
+	public Address add(@RequestBody Address address) {
+		EntityManager em = DBUtility.getEntityManager();
+
+		EntityTransaction et = em.getTransaction();
+
+		try {
+			et.begin();
+			em.persist(address);
+			et.commit();
+		} catch (Exception e) {
+			et.rollback();
+		} finally {
+			em.close();
+		}
+
+		return address;
 	}
-	
+
 	@GetMapping("/get/{id}")
-	public Address get(@PathVariable Long id)
-	{
-          EntityManager et=DBUtility.getEntityManager();
-		
+	public Address get(@PathVariable Long id) {
+		EntityManager et = DBUtility.getEntityManager();
+
 		return et.find(Address.class, id);
-		
+
 	}
-	
+
 	@GetMapping("/get")
-	public List<Address> getAll()
-	{
-		EntityManager entityManager=DBUtility.getEntityManager();
-		  TypedQuery<Address> query = entityManager.createQuery("SELECT t from "+ Address.class.getSimpleName() +" t",Address.class);
-		
-		  return query.getResultList();
+	public List<Address> getAll() {
+		EntityManager entityManager = DBUtility.getEntityManager();
+		TypedQuery<Address> query = entityManager.createQuery("SELECT t from " + Address.class.getSimpleName() + " t",Address.class);
+
+		return query.getResultList();
 	}
-	
 
 }

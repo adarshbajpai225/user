@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -23,9 +22,6 @@ import com.example.User_Details.util.DBUtility;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
-	@PersistenceContext
-	private EntityManager entityManager;
 
 	@PostMapping("/post")
 	public User Save(@RequestBody User user) {
@@ -66,57 +62,8 @@ public class UserController {
 
 		return entityManager.find(User.class, id);
 
+	
+		
 	}
-
-	@GetMapping("/join")
-	public List<UserWithProfileDto> getUsersWithProfile() {
-		EntityManager entityManager = DBUtility.getEntityManager();
-
-		String sqlQuery = "SELECT u.id, u.firstname, u.lastname, u.email, u.password, u.status, up.up_id, up.dob "
-				+ "FROM user u " + "LEFT JOIN userprofile up ON u.id = up.userid";
-
-		Query query = entityManager.createNativeQuery(sqlQuery);
-		List<Object[]> result = query.getResultList();
-
-		List<UserWithProfileDto> userWithProfileList = new ArrayList<>();
-		for (Object[] row : result) {
-			Integer userId = (Integer) row[0];
-			String firstname = (String) row[1];
-			String lastname = (String) row[2];
-			String email = (String) row[3];
-			String password = (String) row[4];
-			Byte status = (Byte) row[5];
-			Integer profileId = (Integer) row[6];
-			Date dob = (Date) row[7];
-
-			UserWithProfileDto userWithProfile = new UserWithProfileDto(userId, firstname, lastname, email, password,
-					status, profileId, dob);
-			userWithProfileList.add(userWithProfile);
-		}
-
-		return userWithProfileList;
-	}
-
-	// Example method to fetch level 2 data (User Address) using userId
-
-//		@GetMapping("/get")
-//		public void getUser(){
-//			SessionFactory factory = new Configuration().configure().buildSessionFactory();
-//		    Session session = factory.openSession();
-	//
-//		    String query = "SELECT * FROM user";
-//		    NativeQuery<Object[]> nativeQuery = session.createNativeQuery(query);
-	//
-//		    List<Object[]> resultList = nativeQuery.list();
-	//
-//		    for (Object[] user : resultList) {
-//		        System.out.println(Arrays.toString(user));
-//		        System.out.println(user[0] + " : " + user[1]);
-//		    }
-	//
-//		    session.close();
-//		    factory.close();
-//			
-//		}
 
 }

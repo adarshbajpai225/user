@@ -20,8 +20,6 @@ import com.example.User_Details.util.DBUtility;
 @RequestMapping("/mobile")
 public class MobileController {
 	
-	@PersistenceContext
-	private EntityManager entityManager;
 	
 	@PostMapping("/post")
 	public Mobile save(@RequestBody Mobile mobile)
@@ -59,7 +57,7 @@ public class MobileController {
 	@GetMapping("/get")
 	public List<Mobile> getAll()
 	{
-EntityManager et=DBUtility.getEntityManager();
+        EntityManager et=DBUtility.getEntityManager();
 		
 		TypedQuery<Mobile> q=et.createQuery("SELECT t from "+ Mobile.class.getSimpleName() +"t", Mobile.class);
 		

@@ -1,5 +1,6 @@
 package com.example.User_Details.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -15,33 +16,39 @@ import com.example.User_Details.util.DBUtility;
 @RestController
 public class UserwithProfileController {
 
-	@PersistenceContext
-	private EntityManager entityManager;
-
 	@GetMapping("/alluser/{state}/{city}")
 	public List<User> getUserWithProfile(@PathVariable("state") String state, @PathVariable("city") String city) {
+		try {
+			EntityManager entityManager = DBUtility.getEntityManager();
+			TypedQuery<User> query;
 
-		EntityManager entityManager = DBUtility.getEntityManager();
-
-		TypedQuery<User> query;
-		if ((state==null || state.equalsIgnoreCase("null")) && (city==null)|| city.equalsIgnoreCase("null")) {
+			if ((state == null || state.equalsIgnoreCase("null")) && (city == null) || city.equalsIgnoreCase("null")) {
+				
+				query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid", User.class);
+				
+			} else if (state != null && (city == null || city.equalsIgnoreCase("null"))) {
+				
+				query = entityManager.createQuery(
+						"SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state", User.class);
+				query.setParameter("state", state);
+				
+			} else {
+				query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state AND a.city =:city",
+						User.class);
+				query.setParameter("state", state);
+				query.setParameter("city", city);
+			}
 			
-			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid ", User.class);
-		
+			List<User> userList = query.getResultList();
 
-		} else if (state!= null && (city == null || city.equalsIgnoreCase("null"))) {
-			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state ", User.class);
-			query.setParameter("state", state);
-			
-		} else {
-			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state AND a.city =:city",User.class);
-			query.setParameter("state",state); 
-			query.setParameter("city",city);
+			return userList;
+
+		} catch (Exception e) {
+
+			String msg = e.getMessage();
+			e.printStackTrace();
+			return Collections.emptyList();
 
 		}
-		List<User> userList = query.getResultList();
-
-		return userList;
 	}
-
 }
