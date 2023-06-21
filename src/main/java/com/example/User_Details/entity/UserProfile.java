@@ -16,7 +16,7 @@ public class UserProfile {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long up_id;
 	
-	private Long userid ;
+	private Long userid;
 
     private Date dob;
 

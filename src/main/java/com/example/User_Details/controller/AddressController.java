@@ -3,7 +3,6 @@ package com.example.User_Details.controller;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +21,19 @@ public class AddressController {
 
 	@PostMapping("/post")
 	public Address add(@RequestBody Address address) {
-		EntityManager em = DBUtility.getEntityManager();
+		EntityManager em = null;
 
-		EntityTransaction et = em.getTransaction();
+		EntityTransaction et = null;
 
 		try {
+			em = DBUtility.getEntityManager();
+			et = em.getTransaction();
 			et.begin();
 			em.persist(address);
 			et.commit();
 		} catch (Exception e) {
 			et.rollback();
+			throw new RuntimeException(e);
 		} finally {
 			em.close();
 		}
@@ -41,18 +43,27 @@ public class AddressController {
 
 	@GetMapping("/get/{id}")
 	public Address get(@PathVariable Long id) {
-		EntityManager et = DBUtility.getEntityManager();
+		try {
+			EntityManager et = DBUtility.getEntityManager();
 
-		return et.find(Address.class, id);
+			return et.find(Address.class, id);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 
 	@GetMapping("/get")
 	public List<Address> getAll() {
-		EntityManager entityManager = DBUtility.getEntityManager();
-		TypedQuery<Address> query = entityManager.createQuery("SELECT t from " + Address.class.getSimpleName() + " t",Address.class);
+		try {
+			EntityManager entityManager = DBUtility.getEntityManager();
+			TypedQuery<Address> query = entityManager
+					.createQuery("SELECT t from " + Address.class.getSimpleName() + " t", Address.class);
 
-		return query.getResultList();
+			return query.getResultList();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

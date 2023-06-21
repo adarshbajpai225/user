@@ -1,12 +1,9 @@
 package com.example.User_Details.controller;
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +32,7 @@ public class UserController {
 		} catch (Exception e) {
 
 			et.rollback();
-			String errorMessage = e.getMessage();
+			throw new RuntimeException(e);
 
 		} finally {
 			em.close();
@@ -47,23 +44,28 @@ public class UserController {
 
 	@GetMapping("/get")
 	public List<User> getUser() {
-
-		EntityManager entityManager = DBUtility.getEntityManager();
-		TypedQuery<User> query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
-				User.class);
-		return query.getResultList();
+		try {
+			EntityManager entityManager = DBUtility.getEntityManager();
+			TypedQuery<User> query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
+					User.class);
+			return query.getResultList();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 
 	@GetMapping("/get/{id}")
 	public User getUserById(@PathVariable Long id) {
 
-		EntityManager entityManager = DBUtility.getEntityManager();
+		try {
+			EntityManager entityManager = DBUtility.getEntityManager();
 
-		return entityManager.find(User.class, id);
+			return entityManager.find(User.class, id);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
-	
-		
 	}
 
 }

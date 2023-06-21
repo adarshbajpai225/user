@@ -21,15 +21,17 @@ public class UserProfileController {
 
 	@PostMapping("/post")
 	public UserProfile post(@RequestBody UserProfile userProfile) {
-		EntityManager entityManager = DBUtility.getEntityManager();
-		EntityTransaction et = entityManager.getTransaction();
+		EntityManager entityManager = null;
+		EntityTransaction et = null;
 		try {
+			entityManager = DBUtility.getEntityManager();
+			et = entityManager.getTransaction();
 			et.begin();
 			entityManager.persist(userProfile);
 			et.commit();
 		} catch (Exception e) {
 			et.rollback();
-			String m = e.getMessage();
+			throw new RuntimeException(e);
 		} finally {
 			entityManager.close();
 		}
@@ -39,19 +41,27 @@ public class UserProfileController {
 
 	@GetMapping("/get")
 	public List<UserProfile> getAll() {
-		EntityManager em = DBUtility.getEntityManager();
+		try {
+			EntityManager em = DBUtility.getEntityManager();
+			TypedQuery<UserProfile> q = em.createQuery("SELECT t from " + UserProfile.class.getSimpleName() + " t",
+					UserProfile.class);
+			return q.getResultList();
+		}
 
-		TypedQuery<UserProfile> q = em.createQuery("SELECT t from " + UserProfile.class.getSimpleName() + " t",
-				UserProfile.class);
-
-		return q.getResultList();
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@GetMapping("/get/{id}")
 	public UserProfile getById(@PathVariable Long id) {
-		EntityManager em = DBUtility.getEntityManager();
 
-		return em.find(UserProfile.class, id);
+		try {
+			EntityManager em = DBUtility.getEntityManager();
+			return em.find(UserProfile.class, id);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
