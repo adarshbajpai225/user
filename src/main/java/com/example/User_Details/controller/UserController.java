@@ -35,7 +35,7 @@ public class UserController {
 			u1=user;
 		} catch (Exception e) {
 
-			et.rollback();
+			
 			throw new RuntimeException(e);
 
 		} finally {
@@ -53,9 +53,10 @@ public class UserController {
 	public List<User> getUser() {
 		EntityManager entityManager = null;
 		List<User> u1=null;
+		TypedQuery<User> query ;
 		try {
 			entityManager = DBUtility.getEntityManager();
-			TypedQuery<User> query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
+			query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
 					User.class);
 			u1= query.getResultList();
 		} catch (Exception e) {

@@ -35,7 +35,7 @@ public class AddressController {
 			result=address;
 			
 		} catch (Exception e) {
-			et.rollback();
+			
 			throw new RuntimeException(e);
 		} finally {
 			if(em !=null && em.isOpen())
@@ -67,9 +67,10 @@ public class AddressController {
 	public List<Address> getAll() {
 		EntityManager entityManager = null;
 		List<Address> list=null;
+		TypedQuery<Address> query;
 		try {
 		  entityManager = DBUtility.getEntityManager();
-		  TypedQuery<Address> query = entityManager.createQuery("SELECT t from " + Address.class.getSimpleName() + " t", Address.class);
+		   query = entityManager.createQuery("SELECT t from " + Address.class.getSimpleName() + " t", Address.class);
 
 			list= query.getResultList();
 		} catch (Exception e) {

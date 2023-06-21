@@ -18,10 +18,10 @@ public class UserwithProfileController {
 	public List<User> getUserWithProfile(@PathVariable("state") String state, @PathVariable("city") String city) {
 		EntityManager entityManager = null;
 		List<User> result=null;
+		TypedQuery<User> query;
 		 
 		try {
 			entityManager = DBUtility.getEntityManager();
-			TypedQuery<User> query;
   
 			if ((state == null || state.equalsIgnoreCase("null")) && (city == null) || city.equalsIgnoreCase("null")) {
 

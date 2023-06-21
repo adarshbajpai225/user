@@ -32,7 +32,7 @@ public class MobileController {
 			et.commit();
 			mb=mobile;
 		} catch (Exception e) {
-			et.rollback();
+			
 			throw new RuntimeException(e);
 		} finally {
 			if(em !=null && em.isOpen())
@@ -63,10 +63,11 @@ public class MobileController {
 	public List<Mobile> getAll() {
 		EntityManager et = DBUtility.getEntityManager();
 		List<Mobile> result=null;
+		TypedQuery<Mobile> q ;
 		try {
 		   et = DBUtility.getEntityManager();
 
-			TypedQuery<Mobile> q = et.createQuery("SELECT t from " + Mobile.class.getSimpleName() + "t", Mobile.class);
+			q= et.createQuery("SELECT t from " + Mobile.class.getSimpleName() + "t", Mobile.class);
 
 			result= q.getResultList();
 		} catch (Exception e) {

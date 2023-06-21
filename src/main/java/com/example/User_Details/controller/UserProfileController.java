@@ -24,6 +24,8 @@ public class UserProfileController {
 		EntityManager entityManager = null;
 		EntityTransaction et = null;
 		UserProfile up=null;
+		
+		
 		try {
 			entityManager = DBUtility.getEntityManager();
 			et = entityManager.getTransaction();
@@ -32,7 +34,7 @@ public class UserProfileController {
 			et.commit();
 			up=userProfile;
 		} catch (Exception e) {
-			et.rollback();
+			
 			throw new RuntimeException(e);
 		} finally {
 			if(entityManager !=null && entityManager.isOpen())
@@ -49,10 +51,10 @@ public class UserProfileController {
 	public List<UserProfile> getAll() {
 		EntityManager em=null;
 		List<UserProfile> result=null;
+		TypedQuery<UserProfile> q;
 		try {
 		   em = DBUtility.getEntityManager();
-			TypedQuery<UserProfile> q = em.createQuery("SELECT t from " + UserProfile.class.getSimpleName() + " t",
-					UserProfile.class);
+			q = em.createQuery("SELECT t from " + UserProfile.class.getSimpleName() + " t",UserProfile.class);
 			result= q.getResultList();
 		}
 
