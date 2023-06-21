@@ -1,38 +1,47 @@
 package com.example.User_Details.controller;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.User_Details.entity.User;
-import com.example.User_Details.entity.User1;
-import com.example.User_Details.entity.UserProfile;
-import com.example.User_Details.entity.UserProfile1;
-import com.example.User_Details.entity.UserwithProfile;
 import com.example.User_Details.util.DBUtility;
 
 @RestController
 public class UserwithProfileController {
-	
-	@GetMapping("/user-with-profile/{id}")
-	public UserwithProfile getUserWithProfile(@PathVariable Long id) {
-	    EntityManager entityManager = DBUtility.getEntityManager();
 
-	    // level 1
-	    User user = entityManager.find(User.class,id);
-	    User1 user1 = new User1(user.getId(),user.getFirstname(), user.getLastname());
+	@PersistenceContext
+	private EntityManager entityManager;
 
-	   
+	@GetMapping("/alluser/{state}/{city}")
+	public List<User> getUserWithProfile(@PathVariable("state") String state, @PathVariable("city") String city) {
 
-	    //  level 2
-	    UserProfile userProfile = entityManager.find(UserProfile.class, id);
-	    UserProfile1 userProfile1 = new UserProfile1(userProfile.getUp_id(),userProfile.getUserid(),userProfile.getDob());
+		EntityManager entityManager = DBUtility.getEntityManager();
 
+		TypedQuery<User> query;
+		if ((state==null || state.equalsIgnoreCase("null")) && (city==null)|| city.equalsIgnoreCase("null")) {
+			
+			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid ", User.class);
+		
 
-	    
-	    UserwithProfile userwithProfile = new UserwithProfile(user1, userProfile1);
+		} else if (state!= null && (city == null || city.equalsIgnoreCase("null"))) {
+			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state ", User.class);
+			query.setParameter("state", state);
+			
+		} else {
+			query = entityManager.createQuery("SELECT u FROM User u JOIN Address a ON u.id = a.userid WHERE a.state =:state AND a.city =:city",User.class);
+			query.setParameter("state",state); 
+			query.setParameter("city",city);
 
-	    return userwithProfile	;
+		}
+		List<User> userList = query.getResultList();
+
+		return userList;
 	}
+
 }
