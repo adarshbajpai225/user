@@ -24,7 +24,7 @@ public class UserController {
 	public User Save(@RequestBody User user) {
 		EntityManager em = null;
 		EntityTransaction et = null;
-		User u1=null;
+		User u1 = null;
 
 		try {
 			em = DBUtility.getEntityManager();
@@ -32,17 +32,15 @@ public class UserController {
 			et.begin();
 			em.persist(user);
 			et.commit();
-			u1=user;
+			u1 = user;
 		} catch (Exception e) {
-
-			
+            
 			throw new RuntimeException(e);
 
 		} finally {
-			if(em !=null && em.isOpen())
-			{
+			if (em != null && em.isOpen()) {
 				em.close();
-			}	
+			}
 		}
 
 		return u1;
@@ -52,26 +50,25 @@ public class UserController {
 	@GetMapping("/get")
 	public List<User> getUser() {
 		EntityManager entityManager = null;
-		List<User> u1=null;
-		TypedQuery<User> query ;
+		List<User> u1 = null;
+		TypedQuery<User> query;
 		try {
 			entityManager = DBUtility.getEntityManager();
-			query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o",
-					User.class);
-			u1= query.getResultList();
+			query = entityManager.createQuery("SELECT o from " + User.class.getSimpleName() + " o", User.class);
+			u1 = query.getResultList();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-        return u1;
+		return u1;
 	}
 
 	@GetMapping("/get/{id}")
 	public User getUserById(@PathVariable Long id) {
-         User u1=null;
+		User u1 = null;
 		try {
 			EntityManager entityManager = DBUtility.getEntityManager();
 
-			u1= entityManager.find(User.class, id);
+			u1 = entityManager.find(User.class, id);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

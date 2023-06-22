@@ -5,9 +5,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -78,5 +80,56 @@ public class AddressController {
 		}
 		return list;
 	}
+	@DeleteMapping("/del/{id}")
+	public void delete(@PathVariable Long id) {
+	    EntityManager entityManager = null;
+	    EntityTransaction entityTransaction=null;
+
+	    try {
+	        entityManager = DBUtility.getEntityManager();
+	         entityTransaction= entityManager.getTransaction();
+	         entityTransaction.begin();
+	        
+	        Address address = entityManager.find(Address.class, id);
+	        entityManager.remove(address);
+	      entityTransaction.commit();
+	        
+	    } catch (Exception e) {
+	        throw new RuntimeException(e);
+	    } finally {
+	    	
+	        if (entityManager != null && entityManager.isOpen()) {
+	            entityManager.close();
+	        }
+	    }
+	}
+	
+	 
+	
+	@PutMapping("/update/{id}")
+      public void update(@PathVariable Long id)
+	{
+    	  EntityManager entityManager =null;
+    	  EntityTransaction entityTransaction =null;
+    	   try {
+    	  
+    		  entityManager=DBUtility.getEntityManager();
+    		  entityTransaction=entityManager.getTransaction();
+    		  entityTransaction.begin();
+    		  Address address=entityManager.find(Address.class, id);
+    		  entityManager.merge(address);
+    		  entityTransaction.commit();
+    		  
+    	   }
+    	   catch(Exception e)
+    	   {
+    		 
+    		   throw new RuntimeException(e); 
+    	   }
+    	  finally {
+    		  entityManager.close();
+    	  }
+      }
+	
 
 }
