@@ -1,5 +1,6 @@
 package com.example.User_Details.controller;
 
+import java.io.IOException;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -78,6 +79,7 @@ public class AddressController {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		
 		return list;
 	}
 	@DeleteMapping("/del/{id}")
@@ -104,28 +106,43 @@ public class AddressController {
 	    }
 	}
 	
+	
 	 
 	
 	@PutMapping("/update/{id}")
-      public void update(@PathVariable Long id)
+      public void update(@PathVariable Long id,@RequestBody Address newaddress)
 	{
     	  EntityManager entityManager =null;
     	  EntityTransaction entityTransaction =null;
     	   try {
     	  
     		  entityManager=DBUtility.getEntityManager();
+    		  
     		  entityTransaction=entityManager.getTransaction();
     		  entityTransaction.begin();
-    		  Address address=entityManager.find(Address.class, id);
-    		  entityManager.merge(address);
-    		  entityTransaction.commit();
-    		  
-    	   }
-    	   catch(Exception e)
-    	   {
+    		  Address address=entityManager.find(Address.class,id);
     		 
-    		   throw new RuntimeException(e); 
-    	   }
+    			  if(address !=null)
+    			  {
+    				address.setCity(newaddress.getCity());
+    				address.setHouseno(newaddress.getHouseno());
+    			    entityManager.merge(address);
+    			    entityTransaction.commit();
+    			  }
+    		 
+    		  
+    	   
+           } catch (IllegalArgumentException e) {
+              
+               System.out.println( e.getMessage());
+               
+           } catch (RuntimeException e) {
+             
+               System.out.println("A RuntimeException occurred: " + e.getMessage());
+           } catch (Exception e) {
+              
+               System.out.println("An unexpected exception occurred: " + e.getMessage());
+           }
     	  finally {
     		  entityManager.close();
     	  }
